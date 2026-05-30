@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DM Tracker</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body{
+    background:#0f172a;
+}
+.card{
+    background:#1e293b;
+    border:1px solid #334155;
+}
+</style>
+</head>
+<body class="text-white min-h-screen">
+
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center flex-col mb-8">
+        <h1 class="text-4xl font-bold mb-4">DM Tracker</h1>
+
+<div class="flex gap-3 flex-wrap">
+
+    <button
+    onclick="updateMetric('dmsSent')"
+    class="bg-gradient-to-r from-blue-500 to-cyan-500 px-5 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition">
+        📩 DM Sent
+    </button>
+
+    <button
+    onclick="updateMetric('replies')"
+    class="bg-gradient-to-r from-green-500 to-emerald-500 px-5 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition">
+        💬 Reply
+    </button>
+
+    <button
+    onclick="updateMetric('interested')"
+    class="bg-gradient-to-r from-yellow-500 to-orange-500 px-5 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition">
+        🔥 Interested
+    </button>
+
+    <button
+    onclick="updateMetric('closed')"
+    class="bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition">
+        💰 Closed
+    </button>
+
+</div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid md:grid-cols-4 gap-4 mb-8">
+
+        <div class="card p-5 rounded-xl">
+            <p class="text-gray-400">Cold DMs Sent</p>
+            <h2 id="dmsSent" class="text-3xl font-bold">0</h2>
+        </div>
+
+        <div class="card p-5 rounded-xl">
+            <p class="text-gray-400">Replies Received</p>
+            <h2 id="replies" class="text-3xl font-bold">0</h2>
+        </div>
+
+        <div class="card p-5 rounded-xl">
+            <p class="text-gray-400">Interested</p>
+            <h2 id="interested" class="text-3xl font-bold">0</h2>
+        </div>
+
+        <div class="card p-5 rounded-xl">
+            <p class="text-gray-400">Clients Closed</p>
+            <h2 id="closed" class="text-3xl font-bold">0</h2>
+        </div>
+
+    </div>
+
+    <!-- Conversion Metrics -->
+    <div class="card rounded-xl p-6 mb-8">
+        <h2 class="text-xl font-bold mb-4">
+            Conversion Metrics
+        </h2>
+
+        <div class="grid md:grid-cols-4 gap-4">
+
+            <div>
+                <p class="text-gray-400">Reply Rate</p>
+                <p id="replyRate" class="text-2xl font-bold">0%</p>
+            </div>
+
+            <div>
+                <p class="text-gray-400">Interest Rate</p>
+                <p id="interestRate" class="text-2xl font-bold">0%</p>
+            </div>
+
+            <div>
+                <p class="text-gray-400">Close Rate</p>
+                <p id="closeRate" class="text-2xl font-bold">0%</p>
+            </div>
+
+            <div>
+                <p class="text-gray-400">Overall Conversion</p>
+                <p id="overallRate" class="text-2xl font-bold">0%</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Interested Leads -->
+    <div class="card rounded-xl p-6 mb-8">
+
+        <div class="flex justify-between mb-4">
+            <h2 class="text-xl font-bold">
+                Interested Leads
+            </h2>
+
+            <button
+                onclick="addLead()"
+                class="bg-blue-600 px-4 py-2 rounded">
+                Add Lead
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                <tr class="text-left border-b border-slate-700">
+                    <th class="p-2">Instagram</th>
+                    <th class="p-2">Name</th>
+                    <th class="p-2">Niche</th>
+                    <th class="p-2">Notes</th>
+                    <th class="p-2">Last Contact</th>
+                    <th class="p-2">Action</th>
+                </tr>
+                </thead>
+
+                <tbody id="leadTable"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Closed Clients -->
+    <div class="card rounded-xl p-6">
+
+        <div class="flex justify-between mb-4">
+            <h2 class="text-xl font-bold">
+                Closed Clients
+            </h2>
+
+            <button
+                onclick="addClient()"
+                class="bg-purple-600 px-4 py-2 rounded">
+                Add Client
+            </button>
+        </div>
+
+        <h3 class="mb-4 text-green-400 text-xl">
+            Monthly Revenue:
+            ₹<span id="totalRevenue">0</span>
+        </h3>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                <tr class="text-left border-b border-slate-700">
+                    <th class="p-2">Client</th>
+                    <th class="p-2">Instagram</th>
+                    <th class="p-2">₹/Reel</th>
+                    <th class="p-2">Reels/Month</th>
+                    <th class="p-2">Revenue</th>
+                    <th class="p-2">Action</th>
+                </tr>
+                </thead>
+
+                <tbody id="clientTable"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("dmTracker")) || {
+    metrics:{
+        dmsSent:0,
+        replies:0,
+        interested:0,
+        closed:0
+    },
+    leads:[],
+    clients:[]
+};
+
+function saveData(){
+    localStorage.setItem(
+        "dmTracker",
+        JSON.stringify(data)
+    );
+}
+
+function updateMetric(type){
+
+    let actionName = {
+        dmsSent: "add 1 DM Sent",
+        replies: "add 1 Reply",
+        interested: "add 1 Interested Lead",
+        closed: "add 1 Closed Client"
+    };
+
+    let confirmed = confirm(
+        "Are you sure you want to " +
+        actionName[type] +
+        "?"
+    );
+
+    if(!confirmed){
+        return;
+    }
+
+    data.metrics[type]++;
+
+    saveData();
+
+    render();
+}
+
+function addLead(){
+
+    let instagram = prompt("Instagram Username");
+    if(!instagram) return;
+
+    let name = prompt("Name");
+    let niche = prompt("Niche");
+    let notes = prompt("Notes");
+
+    data.leads.push({
+        instagram,
+        name,
+        niche,
+        notes,
+        lastContact:new Date().toLocaleDateString()
+    });
+
+    saveData();
+    render();
+}
+
+function addClient(){
+
+    let name = prompt("Client Name");
+    if(!name) return;
+
+    let instagram = prompt("Instagram Username");
+    let pricePerReel = Number(prompt("Price Per Reel"));
+    let reelsPerMonth = Number(prompt("Reels Per Month"));
+
+    data.clients.push({
+        name,
+        instagram,
+        pricePerReel,
+        reelsPerMonth
+    });
+
+    saveData();
+    render();
+}
+
+function render(){
+
+    document.getElementById("dmsSent").textContent =
+        data.metrics.dmsSent;
+
+    document.getElementById("replies").textContent =
+        data.metrics.replies;
+
+    document.getElementById("interested").textContent =
+        data.metrics.interested;
+
+    document.getElementById("closed").textContent =
+        data.metrics.closed;
+
+    let replyRate =
+        data.metrics.dmsSent
+        ? (data.metrics.replies /
+           data.metrics.dmsSent *100)
+        : 0;
+
+    let interestRate =
+        data.metrics.replies
+        ? (data.metrics.interested /
+           data.metrics.replies *100)
+        : 0;
+
+    let closeRate =
+        data.metrics.interested
+        ? (data.metrics.closed /
+           data.metrics.interested *100)
+        : 0;
+
+    let overallRate =
+        data.metrics.dmsSent
+        ? (data.metrics.closed /
+           data.metrics.dmsSent *100)
+        : 0;
+
+    document.getElementById("replyRate")
+        .textContent = replyRate.toFixed(1)+"%";
+
+    document.getElementById("interestRate")
+        .textContent = interestRate.toFixed(1)+"%";
+
+    document.getElementById("closeRate")
+        .textContent = closeRate.toFixed(1)+"%";
+
+    document.getElementById("overallRate")
+        .textContent = overallRate.toFixed(1)+"%";
+
+    let leadHtml = "";
+
+data.leads.forEach((lead,index)=>{
+    leadHtml += `
+    <tr class="border-b border-slate-700">
+        <td class="p-2">${lead.instagram}</td>
+        <td class="p-2">${lead.name}</td>
+        <td class="p-2">${lead.niche}</td>
+        <td class="p-2">${lead.notes}</td>
+        <td class="p-2">${lead.lastContact}</td>
+
+        <td class="p-2">
+            <button
+            onclick="deleteLead(${index})"
+            class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">
+                Delete
+            </button>
+        </td>
+    </tr>`;
+});
+
+    document.getElementById("leadTable")
+        .innerHTML = leadHtml;
+
+    let clientHtml = "";
+    let totalRevenue = 0;
+
+    data.clients.forEach((client,index)=>{
+
+    let revenue =
+        client.pricePerReel *
+        client.reelsPerMonth;
+
+    totalRevenue += revenue;
+
+    clientHtml += `
+    <tr class="border-b border-slate-700">
+        <td class="p-2">${client.name}</td>
+        <td class="p-2">${client.instagram}</td>
+        <td class="p-2">₹${client.pricePerReel}</td>
+        <td class="p-2">${client.reelsPerMonth}</td>
+        <td class="p-2">₹${revenue}</td>
+
+        <td class="p-2">
+            <button
+            onclick="deleteClient(${index})"
+            class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">
+                Delete
+            </button>
+        </td>
+    </tr>`;
+});
+
+    document.getElementById("clientTable")
+        .innerHTML = clientHtml;
+
+    document.getElementById("totalRevenue")
+        .textContent = totalRevenue.toLocaleString();
+
+}
+function deleteLead(index){
+    if(confirm("Delete this lead?")){
+        data.leads.splice(index,1);
+        saveData();
+        render();
+    }
+}
+function deleteClient(index){
+    if(confirm("Delete this client?")){
+        data.clients.splice(index,1);
+        saveData();
+        render();
+    }
+}
+render();
+
+</script>
+
+</body>
+</html>
