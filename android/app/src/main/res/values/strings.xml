@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Sales tracker</string>
-    <string name="title_activity_main">Sales tracker</string>
-    <string name="package_name">com.smartypie.salestracker</string>
-    <string name="custom_url_scheme">com.smartypie.salestracker</string>
-</resources>
