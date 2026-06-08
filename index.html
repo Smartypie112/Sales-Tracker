@@ -203,15 +203,28 @@ body{
 
 <script>
 
-let data = JSON.parse(localStorage.getItem("dmTracker")) || {
+const defaultData = {
     metrics:{
         dmsSent:0,
         replies:0,
         interested:0,
-        closed:0
+        closed:0,
+        ghosted:0,
+        notfit:0
     },
     leads:[],
     clients:[]
+};
+
+let saved = JSON.parse(localStorage.getItem("dmTracker"));
+
+let data = {
+    ...defaultData,
+    ...saved,
+    metrics: {
+        ...defaultData.metrics,
+        ...(saved?.metrics || {})
+    }
 };
 
 function saveData(){
@@ -303,6 +316,10 @@ function render(){
 
     document.getElementById("closed").textContent =
         data.metrics.closed;
+   document.getElementById("ghosted").textContent =
+        data.metrics.ghosted;
+    document.getElementById("notfit").textContent =
+        data.metrics.notfit;
 
     let replyRate =
         data.metrics.dmsSent
