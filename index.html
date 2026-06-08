@@ -44,7 +44,16 @@ body{
     class="bg-gradient-to-r from-yellow-500 to-orange-500 px-5 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition">
         🔥 Interested
     </button>
-
+    <button
+    onclick="updateMetric('notfit')"
+    class="bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition">
+        🙅 Not Fit
+    </button>
+        <button
+    onclick="updateMetric('ghosted')"
+    class="bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition">
+        👻 Ghosted people
+    </button>
     <button
     onclick="updateMetric('closed')"
     class="bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition">
@@ -71,7 +80,14 @@ body{
             <p class="text-gray-400">Interested</p>
             <h2 id="interested" class="text-3xl font-bold">0</h2>
         </div>
-
+        <div class="card p-5 rounded-xl">
+            <p class="text-gray-400">Not Fit people</p>
+            <h2 id="notfit" class="text-3xl font-bold">0</h2>
+        </div>
+         <div class="card p-5 rounded-xl">
+            <p class="text-gray-400">ghosted people</p>
+            <h2 id="ghosted" class="text-3xl font-bold">0</h2>
+        </div>
         <div class="card p-5 rounded-xl">
             <p class="text-gray-400">Clients Closed</p>
             <h2 id="closed" class="text-3xl font-bold">0</h2>
@@ -211,7 +227,9 @@ function updateMetric(type){
         dmsSent: "add 1 DM Sent",
         replies: "add 1 Reply",
         interested: "add 1 Interested Lead",
-        closed: "add 1 Closed Client"
+        closed: "add 1 Closed Client",
+        ghosted: "add 1 Ghosted Client",
+        notfit: "add 1 NotFit people"
     };
 
     let confirmed = confirm(
