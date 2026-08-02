@@ -20,6 +20,7 @@
   --c-reply:#6FA888;
   --c-interest:#D9A441;
   --c-closed:#C1512F;
+  --c-trial:#8C6FA8;
   --leak:#6B6258;
   --danger:#B8493A;
 }
@@ -142,15 +143,20 @@ h1{
 
 .stage{
   display:grid;
-  grid-template-columns:112px 1fr 56px;
+  grid-template-columns:112px 1fr 56px 24px;
   align-items:center;
   gap:14px;
+  padding:6px 0;
+  width:100%;
+}
+
+.stage-tap{
+  display:contents;
   cursor:pointer;
   background:none;
   border:none;
-  padding:6px 0;
+  padding:0;
   text-align:left;
-  width:100%;
   font:inherit;
   color:inherit;
 }
@@ -191,9 +197,24 @@ h1{
   transform:scale(1.18);
 }
 
+.stage-edit{
+  background:none;
+  border:1px solid var(--border);
+  color:var(--muted-2);
+  border-radius:5px;
+  width:22px;
+  height:22px;
+  font-size:11px;
+  line-height:1;
+  cursor:pointer;
+  padding:0;
+}
+.stage-edit:hover{ color:var(--text); border-color:var(--muted); }
+
 .stage[data-stage="dmsSent"] .bar-fill{ background:var(--c-dm); }
 .stage[data-stage="replies"] .bar-fill{ background:var(--c-reply); }
 .stage[data-stage="interested"] .bar-fill{ background:var(--c-interest); }
+.stage[data-stage="trialed"] .bar-fill{ background:var(--c-trial); }
 .stage[data-stage="closed"] .bar-fill{ background:var(--c-closed); }
 
 .stage:hover .bar-track{ box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08); }
@@ -361,35 +382,58 @@ tbody .mono{ color:var(--muted); font-size:12.5px; }
     <h2 class="section-label">Pipeline</h2>
 
     <div class="funnel">
-      <button class="stage" data-stage="dmsSent" onclick="updateMetric('dmsSent')">
-        <span class="stage-label">📩 DMs Sent</span>
-        <span class="bar-track"><span class="bar-fill" id="bar-dmsSent"></span></span>
+      <div class="stage" data-stage="dmsSent">
+        <button class="stage-tap" onclick="updateMetric('dmsSent')">
+          <span class="stage-label">📩 DMs Sent</span>
+          <span class="bar-track"><span class="bar-fill" id="bar-dmsSent"></span></span>
+        </button>
         <span class="stage-count mono" id="dmsSent">0</span>
-      </button>
+        <button class="stage-edit" onclick="editMetric('dmsSent')" title="Set exact count">✎</button>
+      </div>
 
-      <button class="stage" data-stage="replies" onclick="updateMetric('replies')">
-        <span class="stage-label">💬 Replies</span>
-        <span class="bar-track"><span class="bar-fill" id="bar-replies"></span></span>
+      <div class="stage" data-stage="replies">
+        <button class="stage-tap" onclick="updateMetric('replies')">
+          <span class="stage-label">💬 Replies</span>
+          <span class="bar-track"><span class="bar-fill" id="bar-replies"></span></span>
+        </button>
         <span class="stage-count mono" id="replies">0</span>
-      </button>
+        <button class="stage-edit" onclick="editMetric('replies')" title="Set exact count">✎</button>
+      </div>
 
-      <button class="stage" data-stage="interested" onclick="updateMetric('interested')">
-        <span class="stage-label">🔥 Interested</span>
-        <span class="bar-track"><span class="bar-fill" id="bar-interested"></span></span>
+      <div class="stage" data-stage="interested">
+        <button class="stage-tap" onclick="updateMetric('interested')">
+          <span class="stage-label">🔥 Interested</span>
+          <span class="bar-track"><span class="bar-fill" id="bar-interested"></span></span>
+        </button>
         <span class="stage-count mono" id="interested">0</span>
-      </button>
+        <button class="stage-edit" onclick="editMetric('interested')" title="Set exact count">✎</button>
+      </div>
 
-      <button class="stage" data-stage="closed" onclick="updateMetric('closed')">
-        <span class="stage-label">💰 Closed</span>
-        <span class="bar-track"><span class="bar-fill" id="bar-closed"></span></span>
+      <div class="stage" data-stage="trialed">
+        <button class="stage-tap" onclick="updateMetric('trialed')">
+          <span class="stage-label">🧪 Trialed</span>
+          <span class="bar-track"><span class="bar-fill" id="bar-trialed"></span></span>
+        </button>
+        <span class="stage-count mono" id="trialed">0</span>
+        <button class="stage-edit" onclick="editMetric('trialed')" title="Set exact count">✎</button>
+      </div>
+
+      <div class="stage" data-stage="closed">
+        <button class="stage-tap" onclick="updateMetric('closed')">
+          <span class="stage-label">💰 Closed</span>
+          <span class="bar-track"><span class="bar-fill" id="bar-closed"></span></span>
+        </button>
         <span class="stage-count mono" id="closed">0</span>
-      </button>
+        <button class="stage-edit" onclick="editMetric('closed')" title="Set exact count">✎</button>
+      </div>
     </div>
-    <p class="stage-hint">tap a stage to log +1 · bar width is relative to DMs sent</p>
+    <p class="stage-hint">tap a stage to log +1 · tap ✎ to set an exact number · bar width is relative to DMs sent</p>
 
     <div class="leaks">
       <button class="leak-chip" onclick="updateMetric('notfit')">🙅 Not fit <span class="mono" id="notfit">0</span></button>
+      <button class="leak-chip" onclick="editMetric('notfit')" title="Set exact count" style="padding:8px 8px;">✎</button>
       <button class="leak-chip" onclick="updateMetric('ghosted')">👻 Ghosted <span class="mono" id="ghosted">0</span></button>
+      <button class="leak-chip" onclick="editMetric('ghosted')" title="Set exact count" style="padding:8px 8px;">✎</button>
     </div>
 
     <div class="rates">
@@ -400,6 +444,10 @@ tbody .mono{ color:var(--muted); font-size:12.5px; }
       <div class="rate-item">
         <span class="rate-label">Interest rate</span>
         <span class="rate-value" id="interestRate" style="color:var(--c-interest)">0%</span>
+      </div>
+      <div class="rate-item">
+        <span class="rate-label">Trial rate</span>
+        <span class="rate-value" id="trialRate" style="color:var(--c-trial)">0%</span>
       </div>
       <div class="rate-item">
         <span class="rate-label">Close rate</span>
@@ -431,6 +479,29 @@ tbody .mono{ color:var(--muted); font-size:12.5px; }
           </tr>
         </thead>
         <tbody id="leadTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Trials -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2 class="section-label" style="color:var(--c-trial)">On Trial</h2>
+      <button class="add-btn" onclick="addTrial()">+ add trial</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Instagram</th>
+            <th>Name</th>
+            <th>CSM</th>
+            <th>Trial start</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="trialTable"></tbody>
       </table>
     </div>
   </section>
@@ -471,11 +542,13 @@ const defaultData = {
     dmsSent:0,
     replies:0,
     interested:0,
+    trialed:0,
     closed:0,
     ghosted:0,
     notfit:0
   },
   leads:[],
+  trials:[],
   clients:[]
 };
 
@@ -487,11 +560,22 @@ let data = {
   metrics: {
     ...defaultData.metrics,
     ...(saved?.metrics || {})
-  }
+  },
+  leads: saved?.leads || [],
+  trials: saved?.trials || [],
+  clients: saved?.clients || []
 };
 
 function saveData(){
   localStorage.setItem("dmTracker", JSON.stringify(data));
+}
+
+// One-time correction: the Closed count was double-logged by mistake (+2).
+// This runs once, subtracts 2, and marks itself done so it never reruns.
+if(!localStorage.getItem("dmTracker_closedFix_v1")){
+  data.metrics.closed = Math.max(0, data.metrics.closed - 2);
+  localStorage.setItem("dmTracker_closedFix_v1", "done");
+  saveData();
 }
 
 function pulse(id){
@@ -508,6 +592,7 @@ function updateMetric(type){
     dmsSent: "add 1 DM Sent",
     replies: "add 1 Reply",
     interested: "add 1 Interested Lead",
+    trialed: "add 1 Trial",
     closed: "add 1 Closed Client",
     ghosted: "add 1 Ghosted Client",
     notfit: "add 1 NotFit person"
@@ -517,6 +602,32 @@ function updateMetric(type){
   if(!confirmed) return;
 
   data.metrics[type]++;
+  saveData();
+  render();
+  pulse(type);
+}
+
+function editMetric(type){
+  let label = {
+    dmsSent: "DMs Sent",
+    replies: "Replies",
+    interested: "Interested",
+    trialed: "Trialed",
+    closed: "Closed",
+    ghosted: "Ghosted",
+    notfit: "Not fit"
+  }[type];
+
+  let input = prompt("Set exact value for " + label, data.metrics[type]);
+  if(input === null) return;
+
+  let value = Number(input);
+  if(!Number.isFinite(value) || value < 0){
+    alert("Please enter a valid number (0 or higher).");
+    return;
+  }
+
+  data.metrics[type] = Math.round(value);
   saveData();
   render();
   pulse(type);
@@ -551,6 +662,55 @@ function addClient(){
 
   saveData();
   render();
+}
+
+function addTrial(){
+  let instagram = prompt("Instagram Username");
+  if(!instagram) return;
+
+  let name = prompt("Name");
+  let csm = prompt("CSM (who's handling this trial)");
+  let notes = prompt("Notes");
+
+  data.trials.push({
+    instagram, name, csm, notes,
+    trialStart: new Date().toLocaleDateString()
+  });
+
+  saveData();
+  render();
+}
+
+function deleteTrial(index){
+  if(confirm("Delete this trial?")){
+    data.trials.splice(index,1);
+    saveData();
+    render();
+  }
+}
+
+function convertTrial(index){
+  let trial = data.trials[index];
+  if(!trial) return;
+
+  let confirmed = confirm(`Mark @${trial.instagram} as a closed client? This moves them to Closed Clients and removes them from the trial list.`);
+  if(!confirmed) return;
+
+  let pricePerReel = Number(prompt("Price Per Reel", ""));
+  let reelsPerMonth = Number(prompt("Reels Per Month", ""));
+
+  data.clients.push({
+    name: trial.name,
+    instagram: trial.instagram,
+    pricePerReel,
+    reelsPerMonth
+  });
+  data.trials.splice(index,1);
+  data.metrics.closed++;
+
+  saveData();
+  render();
+  pulse("closed");
 }
 
 // ---- Backup / Restore ----
@@ -599,6 +759,7 @@ function importData(event){
         ...incoming,
         metrics: { ...defaultData.metrics, ...(incoming.metrics || {}) },
         leads: Array.isArray(incoming.leads) ? incoming.leads : [],
+        trials: Array.isArray(incoming.trials) ? incoming.trials : [],
         clients: Array.isArray(incoming.clients) ? incoming.clients : []
       };
 
@@ -620,6 +781,7 @@ function render(){
   document.getElementById("dmsSent").textContent = data.metrics.dmsSent;
   document.getElementById("replies").textContent = data.metrics.replies;
   document.getElementById("interested").textContent = data.metrics.interested;
+  document.getElementById("trialed").textContent = data.metrics.trialed;
   document.getElementById("closed").textContent = data.metrics.closed;
   document.getElementById("ghosted").textContent = data.metrics.ghosted;
   document.getElementById("notfit").textContent = data.metrics.notfit;
@@ -631,15 +793,18 @@ function render(){
   document.getElementById("bar-dmsSent").style.width = data.metrics.dmsSent ? "100%" : "0%";
   document.getElementById("bar-replies").style.width = widthFor(data.metrics.replies) + "%";
   document.getElementById("bar-interested").style.width = widthFor(data.metrics.interested) + "%";
+  document.getElementById("bar-trialed").style.width = widthFor(data.metrics.trialed) + "%";
   document.getElementById("bar-closed").style.width = widthFor(data.metrics.closed) + "%";
 
   let replyRate = data.metrics.dmsSent ? (data.metrics.replies / data.metrics.dmsSent * 100) : 0;
   let interestRate = data.metrics.replies ? (data.metrics.interested / data.metrics.replies * 100) : 0;
-  let closeRate = data.metrics.interested ? (data.metrics.closed / data.metrics.interested * 100) : 0;
+  let trialRate = data.metrics.interested ? (data.metrics.trialed / data.metrics.interested * 100) : 0;
+  let closeRate = data.metrics.trialed ? (data.metrics.closed / data.metrics.trialed * 100) : 0;
   let overallRate = data.metrics.dmsSent ? (data.metrics.closed / data.metrics.dmsSent * 100) : 0;
 
   document.getElementById("replyRate").textContent = replyRate.toFixed(1)+"%";
   document.getElementById("interestRate").textContent = interestRate.toFixed(1)+"%";
+  document.getElementById("trialRate").textContent = trialRate.toFixed(1)+"%";
   document.getElementById("closeRate").textContent = closeRate.toFixed(1)+"%";
   document.getElementById("overallRate").textContent = overallRate.toFixed(1)+"%";
 
@@ -659,6 +824,26 @@ function render(){
     </tr>`;
   });
   document.getElementById("leadTable").innerHTML = leadHtml;
+
+  let trialHtml = "";
+  if(data.trials.length === 0){
+    trialHtml = `<tr class="empty-row"><td colspan="6">No one on trial yet — tap "+ add trial" to log one.</td></tr>`;
+  }
+  data.trials.forEach((trial,index)=>{
+    trialHtml += `
+    <tr>
+      <td class="mono">@${trial.instagram}</td>
+      <td>${trial.name || "—"}</td>
+      <td>${trial.csm || "—"}</td>
+      <td class="mono">${trial.trialStart}</td>
+      <td>${trial.notes || "—"}</td>
+      <td style="white-space:nowrap">
+        <button class="del-btn" style="border-color:var(--c-trial);color:var(--c-trial)" onclick="convertTrial(${index})">closed ✓</button>
+        <button class="del-btn" onclick="deleteTrial(${index})">delete</button>
+      </td>
+    </tr>`;
+  });
+  document.getElementById("trialTable").innerHTML = trialHtml;
 
   let clientHtml = "";
   let totalRevenue = 0;
